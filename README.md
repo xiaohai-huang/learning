@@ -1,6 +1,6 @@
 # screen share app
 
-[xiaohai-huang.net](https://xiaohai-huang.net)
+[screen.xiaohai-huang.net](https://screen.xiaohai-huang.net)
 
 ## build
 
