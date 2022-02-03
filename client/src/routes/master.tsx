@@ -12,8 +12,10 @@ function Master() {
   const [status, setStatus] = useState({ camera: false, screen: false });
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
   const [connection, setConnection] = useState<RTCPeerConnection | null>(null);
+  const [sender, setSender] = useState<RTCRtpSender | null>(null);
 
   const onShareScreen = async () => {
+    setStatus({ camera: false, screen: true });
     const stream = await navigator.mediaDevices.getDisplayMedia({
       video: true,
     });
@@ -21,7 +23,7 @@ function Master() {
   };
 
   const onShareCamera = async () => {
-    setStatus((prev) => ({ ...prev, camera: true }));
+    setStatus({ camera: true, screen: false });
     // Requesting local stream
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -36,7 +38,7 @@ function Master() {
   const onStartConnection = async () => {
     const pc = new RTCPeerConnection(WEBRTC_CONNECTION_CONFIG);
     setConnection(pc);
-    // send the ICE candidates to everyone in the room
+    // send the ICE candidates to the person in the room
     pc.onicecandidate = ({ candidate }) => {
       socket?.emit("icecandidate", roomId, candidate);
     };
@@ -50,10 +52,9 @@ function Master() {
     });
 
     // specify the data to be sent to peer
-    console.log(localStream);
-    console.log(localStream?.getVideoTracks()[0]);
-
-    if (localStream) pc.addTrack(localStream.getVideoTracks()[0], localStream);
+    if (localStream) {
+      setSender(pc.addTrack(localStream.getVideoTracks()[0], localStream));
+    }
 
     // create the offer - sdp
     const offerOptions = {
@@ -62,18 +63,23 @@ function Master() {
     const offer = await pc.createOffer(offerOptions);
     await pc.setLocalDescription(offer);
 
-    // send the offer - sdp to everyone in the room
+    // send the offer - sdp to the person in the room
     socket?.emit("offer", roomId, offer);
   };
 
   const onCloseConnection = () => {
     connection?.close();
     setConnection(null);
+    socket?.removeListener("icecandidate");
+    socket?.removeListener("answer");
   };
 
+  // enable switch between screen and camera
   useEffect(() => {
     if (videoRef.current) videoRef.current.srcObject = localStream;
-  }, [localStream]);
+    const videoTrack = localStream?.getVideoTracks()[0];
+    if (sender && videoTrack) sender.replaceTrack(videoTrack);
+  }, [localStream, connection, sender]);
 
   return (
     <main>
