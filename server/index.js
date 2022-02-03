@@ -25,10 +25,16 @@ io.on("connection", (socket) => {
   });
 
   socket.on("join-room", (roomId) => {
-    console.log(`a user joined the room: ${roomId}`);
     socket.join(roomId);
     socket.to(roomId).emit("joined");
+
+    const count = io.sockets.adapter.rooms.get(roomId)?.size || 1;
+    console.log(
+      `a user (${socket.id}) joined the room: ${roomId} - num users: ${count}`
+    );
   });
+
+  socket.on("disconnection", () => {});
 });
 
 // hanlde client-side routing

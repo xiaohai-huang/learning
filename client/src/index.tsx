@@ -1,12 +1,15 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import adapter from "webrtc-adapter";
 
 import App from "./App";
 import "./index.css";
 import reportWebVitals from "./reportWebVitals";
+import ChatRoom from "./routes/chat-room";
 import Master from "./routes/master";
 import Slave from "./routes/slave";
+console.log(adapter);
 
 ReactDOM.render(
   <React.StrictMode>
@@ -15,6 +18,7 @@ ReactDOM.render(
         <Route path="/" element={<App />} />
         <Route path="/master/:roomId" element={<Master />} />
         <Route path="/slave/:roomId" element={<Slave />} />
+        <Route path="/chat-room/:roomId" element={<ChatRoom />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>,

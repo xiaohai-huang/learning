@@ -40,6 +40,8 @@ function App() {
       <NavButton path={`/master/${roomId}`}>Master</NavButton>
       <div style={{ marginTop: "30px" }} />
       <NavButton path={`/slave/${roomId}`}>Slave</NavButton>
+      <div style={{ marginTop: "30px" }} />
+      <NavButton path={`/chat-room/${roomId}`}>Chat Room</NavButton>
     </div>
   );
 }
