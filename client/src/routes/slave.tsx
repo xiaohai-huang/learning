@@ -27,7 +27,10 @@ function Slave() {
       await connection.setRemoteDescription(offer);
 
       // create the answer
-      const answer = await connection.createAnswer();
+      const answer = await connection.createAnswer({
+        offerToReceiveVideo: true,
+        offerToReceiveAudio: true,
+      });
       connection.setLocalDescription(answer);
 
       // send the answer to master
@@ -36,7 +39,7 @@ function Slave() {
 
     connection.ontrack = (e) => {
       console.log("streams ontrack", e.streams);
-      console.log(e.streams[0].getVideoTracks());
+      console.log(e.streams[0].getTracks());
 
       if (videoRef.current) videoRef.current.srcObject = e.streams[0];
     };

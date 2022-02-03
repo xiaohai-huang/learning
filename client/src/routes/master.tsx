@@ -12,7 +12,9 @@ function Master() {
   const [status, setStatus] = useState({ camera: false, screen: false });
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
   const [connection, setConnection] = useState<RTCPeerConnection | null>(null);
-  const [sender, setSender] = useState<RTCRtpSender | null>(null);
+  const [videoSender, setVideoSender] = useState<RTCRtpSender | null>(null);
+  const [audioSender, setAudioSender] = useState<RTCRtpSender | null>(null);
+
   const [connecting, setConnecting] = useState(false);
 
   const onShareScreen = async () => {
@@ -29,6 +31,7 @@ function Master() {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: true,
+        audio: true,
       });
       setLocalStream(stream);
     } catch (err: any) {
@@ -55,12 +58,14 @@ function Master() {
 
     // specify the data to be sent to peer
     if (localStream) {
-      setSender(pc.addTrack(localStream.getVideoTracks()[0], localStream));
+      setVideoSender(pc.addTrack(localStream.getVideoTracks()[0], localStream));
+      setAudioSender(pc.addTrack(localStream.getAudioTracks()[0], localStream));
     }
 
     // create the offer - sdp
     const offerOptions = {
       offerToReceiveVideo: true,
+      offerToReceiveAudio: true,
     };
     const offer = await pc.createOffer(offerOptions);
     await pc.setLocalDescription(offer);
@@ -94,8 +99,10 @@ function Master() {
     if (videoRef.current && videoRef.current.srcObject?.id !== localStream?.id)
       videoRef.current.srcObject = localStream;
     const videoTrack = localStream?.getVideoTracks()[0];
-    if (sender && videoTrack) sender.replaceTrack(videoTrack);
-  }, [localStream, sender]);
+    const audioTrack = localStream?.getAudioTracks()[0];
+    if (videoSender && videoTrack) videoSender.replaceTrack(videoTrack);
+    if (audioSender && audioTrack) audioSender.replaceTrack(audioTrack);
+  }, [audioSender, localStream, videoSender]);
 
   return (
     <main>
@@ -105,6 +112,7 @@ function Master() {
           ref={videoRef}
           autoPlay
           playsInline
+          muted
         />
       </section>
       <button disabled={status.screen} onClick={onShareScreen}>
