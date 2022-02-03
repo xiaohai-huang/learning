@@ -1,8 +1,8 @@
 import { useEffect, useRef } from "react";
 import { useParams } from "react-router";
-import useSocket from "../hooks/useSocket";
 
-const CONNECTION_CONFIG = {};
+import { WEBRTC_CONNECTION_CONFIG } from "../api/WEBRTC_CONFIG";
+import useSocket from "../hooks/useSocket";
 
 function Slave() {
   const { roomId = "default-room" } = useParams();
@@ -10,7 +10,7 @@ function Slave() {
   const socket = useSocket(roomId);
 
   useEffect(() => {
-    const connection = new RTCPeerConnection(CONNECTION_CONFIG);
+    const connection = new RTCPeerConnection(WEBRTC_CONNECTION_CONFIG);
     // @ts-ignore
     window.slave = connection;
     // send the ICE candidates to everyone in the room

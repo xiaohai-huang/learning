@@ -1,9 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router";
+import { WEBRTC_CONNECTION_CONFIG } from "../api/WEBRTC_CONFIG";
 
 import useSocket from "../hooks/useSocket";
-
-const CONNECTION_CONFIG = {};
 
 function Master() {
   const { roomId = "default-room" } = useParams();
@@ -35,7 +34,7 @@ function Master() {
   };
 
   const onStartConnection = async () => {
-    const pc = new RTCPeerConnection(CONNECTION_CONFIG);
+    const pc = new RTCPeerConnection(WEBRTC_CONNECTION_CONFIG);
     setConnection(pc);
     // send the ICE candidates to everyone in the room
     pc.onicecandidate = ({ candidate }) => {
