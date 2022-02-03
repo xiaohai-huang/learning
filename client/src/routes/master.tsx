@@ -13,6 +13,7 @@ function Master() {
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
   const [connection, setConnection] = useState<RTCPeerConnection | null>(null);
   const [sender, setSender] = useState<RTCRtpSender | null>(null);
+  const [connecting, setConnecting] = useState(false);
 
   const onShareScreen = async () => {
     setStatus({ camera: false, screen: true });
@@ -36,6 +37,7 @@ function Master() {
   };
 
   const onStartConnection = async () => {
+    setConnecting(true);
     const pc = new RTCPeerConnection(WEBRTC_CONNECTION_CONFIG);
     setConnection(pc);
     // send the ICE candidates to the person in the room
@@ -68,23 +70,42 @@ function Master() {
   };
 
   const onCloseConnection = () => {
+    setConnecting(false);
     connection?.close();
     setConnection(null);
     socket?.removeListener("icecandidate");
     socket?.removeListener("answer");
   };
 
+  useEffect(() => {
+    socket?.on("joined", () => {
+      onCloseConnection();
+      onStartConnection();
+    });
+    return () => {
+      socket?.removeListener("joined");
+    };
+    // eslint-disable-next-line
+  }, [connection, socket]);
+
   // enable switch between screen and camera
   useEffect(() => {
-    if (videoRef.current) videoRef.current.srcObject = localStream;
+    // @ts-ignore
+    if (videoRef.current && videoRef.current.srcObject?.id !== localStream?.id)
+      videoRef.current.srcObject = localStream;
     const videoTrack = localStream?.getVideoTracks()[0];
     if (sender && videoTrack) sender.replaceTrack(videoTrack);
-  }, [localStream, connection, sender]);
+  }, [localStream, sender]);
 
   return (
     <main>
-      <section>
-        <video ref={videoRef} autoPlay playsInline />
+      <section style={{ width: "100%", height: "500px" }}>
+        <video
+          style={{ backgroundColor: "gray", width: "100%", height: "100%" }}
+          ref={videoRef}
+          autoPlay
+          playsInline
+        />
       </section>
       <button disabled={status.screen} onClick={onShareScreen}>
         Share Screen
@@ -92,8 +113,12 @@ function Master() {
       <button disabled={status.camera} onClick={onShareCamera}>
         Share Camera
       </button>
-      <button onClick={onStartConnection}>Start Connection</button>
-      <button onClick={onCloseConnection}>Close Connection</button>
+      <button onClick={onStartConnection} disabled={!localStream || connecting}>
+        Start Connection
+      </button>
+      <button onClick={onCloseConnection} disabled={!connection || !connecting}>
+        Close Connection
+      </button>
     </main>
   );
 }

@@ -5,6 +5,7 @@ export interface ServerToClientEvents {
   answer: (answer: RTCSessionDescriptionInit) => void;
   icecandidate: (candidate: RTCIceCandidate | null | undefined) => void;
   offer: (offer: RTCSessionDescriptionInit) => void;
+  joined: () => void;
 }
 
 export interface ClientToServerEvents {
