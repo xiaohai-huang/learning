@@ -36,16 +36,20 @@ function ChatRoom() {
         const connection = pcRef.current;
         if (connection) {
           connection.setRemoteDescription(offer);
-          const localStream = await navigator.mediaDevices.getUserMedia(
-            mediaConstraints
-          );
-          firstCameraRef.current &&
-            (firstCameraRef.current.srcObject = localStream);
+          try {
+            const localStream = await navigator.mediaDevices.getUserMedia(
+              mediaConstraints
+            );
+            firstCameraRef.current &&
+              (firstCameraRef.current.srcObject = localStream);
 
-          // send stream back to the initiator
-          localStream
-            .getTracks()
-            .forEach((track) => connection.addTrack(track, localStream));
+            // send stream back to the initiator
+            localStream
+              .getTracks()
+              .forEach((track) => connection.addTrack(track, localStream));
+          } catch (err) {
+            handleGetUserMediaError(err as Error);
+          }
 
           // create answer
           const answer = await connection.createAnswer();
@@ -141,7 +145,7 @@ function ChatRoom() {
     switch (e.name) {
       case "NotFoundError":
         alert(
-          "Unable to open your call because no camera and/or microphone" +
+          "Unable to open your call because no camera and/or microphone " +
             "were found."
         );
         break;
@@ -154,7 +158,7 @@ function ChatRoom() {
         break;
     }
 
-    closeVideoCall();
+    // closeVideoCall();
   }
 
   function closeVideoCall() {
@@ -195,7 +199,7 @@ function ChatRoom() {
       <div className="cameras">
         <h2>Cameras</h2>
         <video ref={firstCameraRef} autoPlay playsInline muted />
-        <video ref={secondCameraRef} autoPlay playsInline />
+        <video ref={secondCameraRef} autoPlay playsInline controls />
       </div>
       <div style={{ marginTop: "30px" }} />
       <button onClick={() => setIsShareScreen((prev) => !prev)}>
@@ -204,8 +208,8 @@ function ChatRoom() {
       {isShareScreen && (
         <div className="screens">
           <h2>Screens</h2>
-          <video ref={firstScreenRef} autoPlay playsInline />
-          <video ref={secondScreenRef} autoPlay playsInline />
+          <video ref={firstScreenRef} autoPlay playsInline controls />
+          <video ref={secondScreenRef} autoPlay playsInline controls />
         </div>
       )}
     </main>
