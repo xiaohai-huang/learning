@@ -28,6 +28,7 @@ jobs:
           tags: xiaohaihuang/screen-share
 
   deploy:
+    needs: build
     runs-on: self-hosted
 
     steps:
