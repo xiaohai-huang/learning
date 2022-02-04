@@ -189,7 +189,9 @@ function ChatRoom() {
   }
   return (
     <main className="chat-room">
-      <h1 style={{ textAlign: "center" }}>Chat Room: {roomId}</h1>
+      <h1 style={{ textAlign: "center", marginTop: "1rem" }}>
+        Chat Room: {roomId}
+      </h1>
       <div className="cameras">
         <h2>Cameras</h2>
         <video ref={firstCameraRef} autoPlay playsInline muted />
