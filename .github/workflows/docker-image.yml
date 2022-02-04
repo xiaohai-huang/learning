@@ -28,4 +28,4 @@ jobs:
           tags: xiaohaihuang/screen-share
 
       - name: Update container
-        run: docker run -it --name watchtower-once --rm  -v /var/run/docker.sock:/var/run/docker.sock containrrr/watchtower --cleanup --run-once
+        run: docker run -i --name watchtower-once --rm  -v /var/run/docker.sock:/var/run/docker.sock containrrr/watchtower --cleanup --run-once
