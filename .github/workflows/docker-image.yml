@@ -27,11 +27,9 @@ jobs:
           push: true
           tags: xiaohaihuang/screen-share
 
-      
-
   deploy:
     runs-on: self-hosted
 
     steps:
       - name: Update container
-          run: docker run -i --name watchtower-once --rm  -v /var/run/docker.sock:/var/run/docker.sock containrrr/watchtower --cleanup --run-once
+        run: docker run -i --name watchtower-once --rm  -v /var/run/docker.sock:/var/run/docker.sock containrrr/watchtower --cleanup --run-once
