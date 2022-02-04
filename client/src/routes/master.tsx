@@ -59,7 +59,10 @@ function Master() {
     // specify the data to be sent to peer
     if (localStream) {
       setVideoSender(pc.addTrack(localStream.getVideoTracks()[0], localStream));
-      setAudioSender(pc.addTrack(localStream.getAudioTracks()[0], localStream));
+      setAudioSender(
+        localStream.getAudioTracks()[0] &&
+          pc.addTrack(localStream.getAudioTracks()[0], localStream)
+      );
     }
 
     // create the offer - sdp
