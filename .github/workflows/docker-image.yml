@@ -26,3 +26,6 @@ jobs:
           context: "."
           push: true
           tags: xiaohaihuang/screen-share
+
+      - name: Update container
+        run: docker run -it --name watchtower-once --rm  -v /var/run/docker.sock:/var/run/docker.sock containrrr/watchtower --cleanup --run-once

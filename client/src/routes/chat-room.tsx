@@ -75,15 +75,20 @@ function ChatRoom() {
 
   async function invite() {
     createPeerConnection();
-    const localStream = await navigator.mediaDevices.getUserMedia(
-      mediaConstraints
-    );
+    try {
+      const localStream = await navigator.mediaDevices.getUserMedia(
+        mediaConstraints
+      );
 
-    if (firstCameraRef.current) firstCameraRef.current.srcObject = localStream;
-    // add stream to connection
-    localStream
-      .getTracks()
-      .forEach((track) => pcRef.current?.addTrack(track, localStream));
+      if (firstCameraRef.current)
+        firstCameraRef.current.srcObject = localStream;
+      // add stream to connection
+      localStream
+        .getTracks()
+        .forEach((track) => pcRef.current?.addTrack(track, localStream));
+    } catch (err) {
+      handleGetUserMediaError(err as Error);
+    }
   }
 
   function createPeerConnection() {
@@ -130,6 +135,26 @@ function ChatRoom() {
     if (pcRef.current?.iceConnectionState === "failed") {
       closeVideoCall();
     }
+  }
+
+  function handleGetUserMediaError(e: Error) {
+    switch (e.name) {
+      case "NotFoundError":
+        alert(
+          "Unable to open your call because no camera and/or microphone" +
+            "were found."
+        );
+        break;
+      case "SecurityError":
+      case "PermissionDeniedError":
+        // Do nothing; this is the same as the user canceling the call.
+        break;
+      default:
+        alert("Error opening your camera and/or microphone: " + e.message);
+        break;
+    }
+
+    closeVideoCall();
   }
 
   function closeVideoCall() {
