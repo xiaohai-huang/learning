@@ -21,6 +21,7 @@ function Master() {
     setStatus({ camera: false, screen: true });
     const stream = await navigator.mediaDevices.getDisplayMedia({
       video: true,
+      audio: true
     });
     setLocalStream(stream);
   };
@@ -61,7 +62,7 @@ function Master() {
       setVideoSender(pc.addTrack(localStream.getVideoTracks()[0], localStream));
       setAudioSender(
         localStream.getAudioTracks()[0] &&
-          pc.addTrack(localStream.getAudioTracks()[0], localStream)
+        pc.addTrack(localStream.getAudioTracks()[0], localStream)
       );
     }
 
